@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-deployment
-  namespace: {{{ NAMESPACE }}}
+  namespace: pr-00
   labels:
     app: posts-deployment
 spec:
-  replicas: {{{ REPLICAS }}}
+  replicas: 1
   selector:
     matchLabels:
       app: posts
