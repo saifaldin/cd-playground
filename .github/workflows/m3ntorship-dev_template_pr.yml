@@ -102,12 +102,11 @@ jobs:
         env:
           VERSION: ${{needs.prepare.outputs.version}}
           SHA: ${{needs.prepare.outputs.sha}}
-
         run: |
-          echo $VERSION
-          mkdir -p $TEMP_DIR
+          echo $M3_VERSION
+          mkdir -p $M3_TEMP_DIR
           for f in $M3_DEPLOYMENT_PATH/*; do mo -u "$f" > $M3_TEMP_DIR/"$(basename $f)"; done
-          kubectl apply -f $TEMP_DIR
+          kubectl apply -f $M3_TEMP_DIR
 
       - name: comment PR
         uses: unsplash/comment-on-pr@master
