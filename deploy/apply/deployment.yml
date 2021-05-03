@@ -21,6 +21,8 @@ spec:
           command: ['node']
           args: ['index.js']
           env:
+            - name: PORT
+              value: '3000'
             - name: APP_NAME
               value: posts
           ports:
