@@ -14,7 +14,7 @@ env:
   M3_COMPONENET: main-service
   M3_ENVIRONMENT: 'pr-${{ github.event.number }}'
   M3_VERSION: 'pr-${{ github.event.number }}-${{ github.run_number}}'
-  M3_NAMESPACE: '${{github.event.organization.login}}-${{github.event.repository.name}}-pr-${{ github.event.number }}'
+  M3_NAMESPACE: '${{github.event.repository.name}}-pr-${{ github.event.number }}'
   M3_DEPLOYMENT_PATH: deploy/apply
   M3_TEMP_DIR: temp
   M3_REPLICAS: '1'
