@@ -20,6 +20,13 @@ jobs:
       sha: ${{steps.prepare.outputs.sha}}
       version: ${{steps.prepare.outputs.version}}
 
+  check-outputs:
+    needs: 
+      - prepare
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "sha ${{needs.prepare.outputs.sha}}"
+      - run: echo "version ${{needs.prepare.outputs.version}}"
 
   build:
     if: ${{github.event.action != 'closed'}}
@@ -119,7 +126,7 @@ jobs:
     if: ${{github.event.action == 'closed'}}
     needs:
       - undeploy-pr
-      
+
     runs-on: ubuntu-latest
     steps:
       - id: delete_old_tags
