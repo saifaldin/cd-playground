@@ -11,15 +11,23 @@ on:
 jobs:
   prepare:
     runs-on: ubuntu-latest
+    outputs:
+      sha: ${{ steps.prepare.outputs.sha }}
+      version: ${{ steps.prepare.outputs.version }}
     steps:
       - uses: actions/checkout@v2
-      - run: |
-          echo ::set-output name=sha::$(git rev-parse HEAD)
-          echo ::set-output name=version::$(git rev-parse --shor=4 HEAD)
-    outputs:
-      sha: ${{steps.prepare.outputs.sha}}
-      version: ${{steps.prepare.outputs.version}}
+      - id: prepare
+        run: |
+          echo "::set-output name=sha::$(git rev-parse HEAD)"
+          echo "::set-output name=version::$(git rev-parse --short=4 HEAD)"
 
+  check-outputs:
+    needs: 
+      - prepare
+    runs-on: ubuntu-latest
+    steps:
+      - run: echo "sha ${{needs.prepare.outputs.sha}}"
+      - run: echo "version ${{needs.prepare.outputs.version}}"
 
   build:
     if: ${{github.event.action != 'closed'}}
@@ -118,7 +126,8 @@ jobs:
   cleanup_docker_tags:
     if: ${{github.event.action == 'closed'}}
     needs:
-      - undeploy_pr
+      - undeploy-pr
+
     runs-on: ubuntu-latest
     steps:
       - id: delete_old_tags
