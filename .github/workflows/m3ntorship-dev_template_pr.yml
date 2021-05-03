@@ -16,7 +16,6 @@ env:
   M3_VERSION: 'pr-${{ github.event.number }}-${{ github.run_number}}'
   M3_NAMESPACE: '${{github.event.organization.login}}-${{github.event.repository.name}}-pr-${{ github.event.number }}'
   M3_DEPLOYMENT_PATH: deploy/apply
-  M3_TEMP_DIR: temp
   M3_REPLICAS: '1'
   M3_PORT_BACKEND: 80
   M3_PORT_BACKEND_MOCK: 81
@@ -44,8 +43,11 @@ jobs:
       - prepare
     runs-on: ubuntu-latest
     steps:
-      - run: echo "sha ${{needs.prepare.outputs.sha}}"
-      - run: echo "version ${{needs.prepare.outputs.version}}"
+      - run: |
+          echo "sha ${{needs.prepare.outputs.sha}}"
+          echo "version ${{needs.prepare.outputs.version}}"
+          echo "m3_version $M3_VERSION"
+
 
   build:
     if: ${{github.event.action != 'closed'}}
