@@ -1,0 +1,17 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: pickify
+  namespace: {{{NAMESPACE}}}
+spec:
+  rules:
+    - host: '{{{DNS_VALUE}}}.{{{HOST_NAME}}}'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pickify-posts
+                port:
+                  number: {{{PORT_BACKEND}}}

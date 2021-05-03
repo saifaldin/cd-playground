@@ -1,0 +1,133 @@
+name: Deploy PR's
+on:
+  pull_request:
+    branches:
+      - master
+    types:
+      - opened
+      - reopened
+      - synchronize
+      - closed
+jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: |
+          echo ::set-output name=sha::$(git rev-parse HEAD)
+          echo ::set-output name=version::$(git rev-parse --shor=4 HEAD)
+    outputs:
+      sha: ${{steps.prepare.outputs.sha}}
+      version: ${{steps.prepare.outputs.version}}
+
+
+  build:
+    if: ${{github.event.action != 'closed'}}
+    needs:
+      - prepare
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - run: yarn
+      - run: yarn build
+      - run: yarn test
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v1 
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and push
+        id: docker_build
+        uses: docker/build-push-action@v2
+        with:
+          tags: saifaldin3388/someapp:${{needs.prepare.outputs.version}}
+          file: Dockerfile
+          context: .
+          push: true
+
+
+  deploy-pr:
+    if: ${{github.event.action != 'closed'}}
+    needs:
+      - prepare
+      - build-and-push-app
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/setup-kubectl@v1
+
+      - name: Kubectl configuration
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_DEV }}" | base64 -d -i > ~/.kube/config
+
+      - name: install moustache
+        run: |
+          curl -sSL https://git.io/get-mo -o mo
+          chmod +x mo
+          sudo mv mo /usr/local/bin/
+          echo "works" | mo
+
+      - name: deploy-pr
+        env:
+          VERSION: ${{needs.prepare.outputs.version}}
+          DEPLOYMENT_PATH: deploy
+          TEMP_DIR: temp
+          NAMESPACE: pr-${{github.event.number}}
+          REPLICAS: '1'
+          PORT_BACKEND: '80'
+          SHA: ${{needs.prepare.outputs.sha}}
+          HOST_NAME: pickify.net
+          DNS_VALUE: test-${{github.event.number}}-pr
+        run: |
+          echo $VERSION
+          mkdir -p $TEMP_DIR
+          for f in $DEPLOYMENT_PATH/apply/*; do mo -u "$f" > $TEMP_DIR/"$(basename $f)"; done
+          kubectl apply -f $TEMP_DIR
+
+      - name: comment PR
+        uses: unsplash/comment-on-pr@master
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          msg: |
+            Check out this commit here: test-${{github.event.number}}-pr.pickify.net
+  
+  undeploy-pr:
+    if: ${{github.event.action == 'closed'}}
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - uses: azure/setup-kubectl@v1
+
+      - name: Kubectl configuration
+        shell: bash
+        run: |
+          mkdir -p ~/.kube
+          echo "${{ secrets.KUBE_CONFIG_DEV }}" | base64 -d -i > ~/.kube/config
+
+      - name: delete pr namespace
+        run: kubectl delete namespace pr-${{github.event.number}}
+      
+  cleanup_docker_tags:
+    if: ${{github.event.action == 'closed'}}
+    needs:
+      - undeploy_pr
+    runs-on: ubuntu-latest
+    steps:
+      - id: delete_old_tags
+        name: Delete old docker image tags
+        uses: m3ntorship/action-dockerhub-cleanup@1.2
+        with:
+          token: ${{secrets.DOCKER_HUB_M3NTORSHIPCI_TOKEN}}
+          user: 'm3ntorshipci'
+          repos: '["pickly-posts"]'
+          keep-last: 0
+          force-full-cleanup: true
+          substrings: '["pr-${{ github.event.number }}"]'

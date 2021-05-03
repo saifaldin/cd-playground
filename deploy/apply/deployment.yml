@@ -1,0 +1,29 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: posts-deployment
+  namespace: {{{NAMESPACE}}}
+  labels:
+    app: posts-deployment
+spec:
+  replicas: {{{REPLICAS}}}
+  selector:
+    matchLabels:
+      app: posts
+  template:
+    metadata:
+      labels:
+        app: posts
+    spec:
+      containers:
+        - name: posts
+          image: "saifaldin3388/someapp:{{{VERSION}}}"
+          command: ['node']
+          args: ['index.js']
+          env:
+            - name: APP_NAME
+              value: posts
+          ports:
+            - name: web
+              containerPort: 3000
+              protocol: TCP

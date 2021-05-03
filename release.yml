@@ -1,0 +1,89 @@
+# name: release
+
+# on:
+#   push:
+#     branches:
+#       - 'master'
+
+# jobs:
+#   prepare:
+#     runs-on: ubuntu-latest
+#     outputs:
+#       sha: ${{ steps.prepare.outputs.sha }}
+#       version: ${{ steps.prepare.outputs.version }}
+#       image: saifaldin3388/someapp
+#       dockerfile: Dockerfile
+#     steps:
+#       - uses: actions/checkout@v2
+#       - id: prepare
+#         run: |
+#           echo "::set-output name=sha::$(git rev-parse HEAD)"
+#           echo "::set-output name=version::$(git rev-parse --short=4 HEAD)"
+#   build-and-push-app:
+#     needs: [prepare]
+#     runs-on: ubuntu-latest
+#     steps:
+#       - uses: actions/checkout@v2
+
+#       - id: install-dependencies
+#         run: yarn
+
+#       - name: Build and push Docker image with version tag
+#         uses: docker/build-push-action@v1
+#         with:
+#           username: ${{ secrets.DOCKER_USERNAME }}
+#           password: ${{ secrets.DOCKER_PASSWORD }}
+#           repository: ${{needs.prepare.outputs.image}}
+#           dockerfile: ${{needs.prepare.outputs.dockerfile}}
+#           tags: ${{needs.prepare.outputs.version}}
+
+#       - name: Build and push Docker image with tag latest
+#         uses: docker/build-push-action@v1
+#         with:
+#           repository: ${{needs.prepare.outputs.image}}
+#           dockerfile: ${{needs.prepare.outputs.dockerfile}}
+#           tags: latest
+
+#   deploy:
+#     needs:
+#       - prepare
+#       - build-and-push-app
+
+#     runs-on: ubuntu-latest
+
+#     steps:
+#       - uses: actions/checkout@v2
+#       - uses: azure/setup-kubectl@v1
+
+#       - name: Kubectl configuration
+#         shell: bash
+#         run: |
+#           mkdir -p ~/.kube
+#           echo "${{ secrets.KUBE_CONFIG_DEV }}" | base64 -d -i > ~/.kube/config
+
+#       - name: install moustache
+#         run: |
+#           curl -sSL https://git.io/get-mo -o mo
+#           chmod +x mo
+#           sudo mv mo /usr/local/bin/
+#           echo "works" | mo
+
+#       # deploy dev
+#       - name: deploy-dev
+#         env:
+#           VERSION: ${{needs.prepare.outputs.version}}
+#           DEPLOYMENT_PATH: deploy
+#           TEMP_DIR: temp
+#           NAMESPACE: pickify
+#           REPLICAS: '1'
+#           PORT_BACKEND: '80'
+#           SHA: ${{needs.prepare.outputs.sha}}
+#           HOST_NAME: ahmedayoub.me
+#           DNS_VALUE: posts
+#           NOTIFICATIONS_DNS_VALUE: notifications
+#           VOTES_DNS_VALUE: votes
+#         run: |
+#           echo $VERSION
+#           mkdir -p $TEMP_DIR
+#           for f in $DEPLOYMENT_PATH/apply/*; do mo -u "$f" > $TEMP_DIR/"$(basename $f)"; done
+#           kubectl apply -f $TEMP_DIR

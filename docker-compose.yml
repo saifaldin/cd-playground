@@ -1,0 +1,35 @@
+version: '3.9'
+services:
+  posts-service:
+    image: someapp:00
+    network_mode: host
+    environment:
+      APP_NAME: posts
+      POSTS_SERVICE_URL: http://localhost:3000
+      NOTIFICATIONS_SERVICE_URL: http://localhost:3001
+      VOTES_SERVICE_URL: http://localhost:3002
+      PORT: 3000
+    # ports:
+    #   - '3000:3000'
+  notifications-service:
+    image: someapp:00
+    network_mode: host
+    environment:
+      APP_NAME: notifications
+      POSTS_SERVICE_URL: http://localhost:3000
+      NOTIFICATIONS_SERVICE_URL: http://localhost:3001
+      VOTES_SERVICE_URL: http://localhost:3002
+      PORT: 3001
+    # ports:
+    #   - '3001:3001'
+  votes-service:
+    image: someapp:00
+    network_mode: host
+    environment:
+      APP_NAME: votes
+      POSTS_SERVICE_URL: http://localhost:3000
+      NOTIFICATIONS_SERVICE_URL: http://localhost:3001
+      VOTES_SERVICE_URL: http://localhost:3002
+      PORT: 3002
+    # ports:
+    #   - '3002:3002'
