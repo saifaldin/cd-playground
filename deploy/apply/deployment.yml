@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-deployment
-  namespace: {{{NAMESPACE}}}
+  namespace: { { { NAMESPACE } } }
   labels:
     app: posts-deployment
 spec:
-  replicas: {{{REPLICAS}}}
+  replicas: { { { REPLICAS } } }
   selector:
     matchLabels:
       app: posts
@@ -16,8 +16,8 @@ spec:
         app: posts
     spec:
       containers:
-        - name: posts
-          image: "saifaldin3388/someapp:{{{VERSION}}}"
+        - name: main-service
+          image: 'saifaldin3388/someapp:{{{VERSION}}}'
           command: ['node']
           args: ['index.js']
           env:
@@ -26,4 +26,18 @@ spec:
           ports:
             - name: web
               containerPort: 3000
+              protocol: TCP
+        - name: mock-service
+          image: 'm3ntorshipci/prism:latest'
+          args:
+            [
+              'mock',
+              '-d',
+              '-h',
+              '0.0.0.0',
+              'https://raw.githubusercontent.com/m3ntorship/backend-nestjs-template/ci-cd/openapi/example.openapi.yml',
+            ]
+          ports:
+            - name: web
+              containerPort: 4010
               protocol: TCP

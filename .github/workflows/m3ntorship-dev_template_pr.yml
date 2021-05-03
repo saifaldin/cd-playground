@@ -56,15 +56,12 @@ jobs:
           context: .
           push: true
 
-
   deploy-pr:
     if: ${{github.event.action != 'closed'}}
     needs:
       - prepare
       - build
-
     runs-on: ubuntu-latest
-
     steps:
       - uses: actions/checkout@v2
       - uses: azure/setup-kubectl@v1
@@ -90,6 +87,7 @@ jobs:
           NAMESPACE: pr-${{github.event.number}}
           REPLICAS: '1'
           PORT_BACKEND: '80'
+          PORT_BACKEND_MOCK: '81'
           SHA: ${{needs.prepare.outputs.sha}}
           HOST_NAME: pickify.net
           DNS_VALUE: test-${{github.event.number}}-pr

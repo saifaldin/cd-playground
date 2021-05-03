@@ -15,3 +15,13 @@ spec:
                 name: pickify-posts
                 port:
                   number: {{{PORT_BACKEND}}}
+    - host: '{{{DNS_VALUE}}}-mock.{{{HOST_NAME}}}'
+      http:
+        paths:
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: pickify-posts
+                port:
+                  number: {{{PORT_BACKEND_MOCK}}}
