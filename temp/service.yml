@@ -2,7 +2,7 @@ apiVersion: v1
 kind: Service
 metadata:
   name: pickify-posts
-  namespace: pr-00
+  namespace: ss-dd-pr-00
 spec:
   selector:
     app: posts

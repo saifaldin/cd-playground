@@ -1,4 +1,4 @@
 apiVersion: v1
 kind: Namespace
 metadata:
-  name: pr-00
+  name: ss-dd-pr-00

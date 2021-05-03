@@ -2,7 +2,7 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-deployment
-  namespace: pr-00
+  namespace: ss-dd-pr-00
   labels:
     app: posts-deployment
 spec:
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: main-service
-          image: 'saifaldin3388/someapp:pr-00-00'
+          image: "saifaldin3388/someapp:pr-00-00"
           command: ['node']
           args: ['index.js']
           env:
@@ -28,7 +28,7 @@ spec:
               containerPort: 3000
               protocol: TCP
         - name: mock-service
-          image: 'm3ntorshipci/prism:latest'
+          image: "m3ntorshipci/prism:latest"
           args:
             [
               'mock',

@@ -2,7 +2,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pickify
-  namespace: pr-00
+  namespace: ss-dd-pr-00
 spec:
   rules:
     - host: 'test-00-pr.pickify.net'

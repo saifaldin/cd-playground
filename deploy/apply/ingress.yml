@@ -2,10 +2,10 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: pickify
-  namespace: {{{NAMESPACE}}}
+  namespace: {{{M3_NAMESPACE}}}
 spec:
   rules:
-    - host: '{{{DNS_VALUE}}}.{{{HOST_NAME}}}'
+    - host: '{{{M3_DNS_VALUE}}}.{{{M3_HOST_NAME}}}'
       http:
         paths:
           - path: /
@@ -14,8 +14,8 @@ spec:
               service:
                 name: pickify-posts
                 port:
-                  number: {{{PORT_BACKEND}}}
-    - host: '{{{DNS_VALUE}}}-mock.{{{HOST_NAME}}}'
+                  number: {{{M3_PORT_BACKEND}}}
+    - host: '{{{M3_DNS_VALUE}}}-mock.{{{M3_HOST_NAME}}}'
       http:
         paths:
           - path: /
@@ -24,4 +24,4 @@ spec:
               service:
                 name: pickify-posts
                 port:
-                  number: {{{PORT_BACKEND_MOCK}}}
+                  number: {{{M3_PORT_BACKEND_MOCK}}}

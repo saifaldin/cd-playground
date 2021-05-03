@@ -2,11 +2,11 @@ apiVersion: apps/v1
 kind: Deployment
 metadata:
   name: posts-deployment
-  namespace: {{{ NAMESPACE }}}
+  namespace: {{{ M3_NAMESPACE }}}
   labels:
     app: posts-deployment
 spec:
-  replicas: {{{ REPLICAS }}}
+  replicas: {{{ M3_REPLICAS }}}
   selector:
     matchLabels:
       app: posts
@@ -17,7 +17,7 @@ spec:
     spec:
       containers:
         - name: main-service
-          image: 'saifaldin3388/someapp:pr-00-00'
+          image: "{{{M3_IMAGE}}}:{{{M3_VERSION}}}"
           command: ['node']
           args: ['index.js']
           env:
@@ -28,7 +28,7 @@ spec:
               containerPort: 3000
               protocol: TCP
         - name: mock-service
-          image: 'm3ntorshipci/prism:latest'
+          image: "{{{M3_MOCK_IMAGE}}}"
           args:
             [
               'mock',
