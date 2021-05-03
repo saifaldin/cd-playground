@@ -53,7 +53,7 @@ jobs:
     if: ${{github.event.action != 'closed'}}
     needs:
       - prepare
-      - build-and-push-app
+      - build
 
     runs-on: ubuntu-latest
 
