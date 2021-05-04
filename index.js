@@ -8,11 +8,6 @@ app.get('/health', (req, res) => {
   res.send({ status: `${appName}-health` });
 });
 
-app.get('/test', (req, res) => {
-  res.send({ status: `${appName}-test` });
-});
-
-
 // app.get('/deep-health', async (req, res) => {
 //   try {
 //     const response = {};
